@@ -60,7 +60,7 @@ def display_cbt_info(vm):
         print("  CBT is disabled")
     for device in vm.config.hardware.device:
         if isinstance(device, vim.vm.device.VirtualDisk):
-            print(f"  Disk: {device.deviceInfo.label}")
+            print(f"  Disk: {device.deviceInfo.label} - {device.backing.diskMode}")
             if device.backing.changeId:
                 print(f"    CBT Enabled: Yes")
             else:
@@ -72,8 +72,8 @@ def display_cbt_info(vm):
             if "independent" in disk_mode:
                 print(f"    Warning: Disk '{device.deviceInfo.label}' on VM '{vm.name}' is configured as '{disk_mode}'. Snapshots may not work as expected.")
 
-def enable_cbt_on_vm(vm):
-    print(f"Enabling CBT for VM: {vm.name}", end='')
+def enable_cbt_on_vm(vm, args):
+    print(f"Enabling CBT for VM: {vm.name}")
     spec = vim.vm.ConfigSpec()
     spec.changeTrackingEnabled = True
     device_changes = []
@@ -83,10 +83,10 @@ def enable_cbt_on_vm(vm):
             disk_mode = device.backing.diskMode
             if "independent" in disk_mode:
                 print(
-                    f" - Warning: Disk '{device.deviceInfo.label}' on VM '{vm.name}' is configured as '{disk_mode}'. Snapshots may not work as expected.", end='')
+                    f" - Warning: Disk '{device.deviceInfo.label}' on VM '{vm.name}' is configured as '{disk_mode}'. Snapshots may not work as expected.")
                 if disk_mode == "independent_persistent" and args.dependent:
-                    print (f"Converting disk")
-
+                    print (f" - Converting disk '{device.deviceInfo.label}' to dependent-persistent disk mode")
+                    device.backing.diskMode = "persistent"
             disk_spec = vim.vm.device.VirtualDeviceSpec()
             disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
             disk_spec.device = device
@@ -109,7 +109,7 @@ def main():
     group.add_argument("--vm_name", help="The name of the virtual machine")
     group.add_argument("--vm_folder", help="The path of the folder containing VMs")
     parser.add_argument("--enable", action='store_true', help="Enable Change Block tracking")
-    parser.add_argument("--dependent", action='store_true', help="Convert independent-persistent disk to dependent")
+    parser.add_argument("--dependent", action='store_true', help="Convert independent-persistent disk to dependent-persistent")
     args = parser.parse_args()
 
     service_instance = connect_to_vc(vc_host, vc_user, vc_password, ssl_context)
@@ -119,7 +119,7 @@ def main():
         vm = get_vm_by_name(content, args.vm_name)
         if vm:
             if args.enable:
-                enable_cbt_on_vm(vm)
+                enable_cbt_on_vm(vm, args)
             else:
                 display_cbt_info(vm)
         else:
@@ -130,14 +130,14 @@ def main():
         if vms:
             for vm in vms:
                 if args.enable:
-                    enable_cbt_on_vm(vm)
+                    enable_cbt_on_vm(vm, args)
                 else:
                     display_cbt_info(vm)
         else:
             print(f"No VMs found in folder '{args.vm_folder}'")
 
     else:
-        print("No VM name or VM folder path provided")
+        print("No VM name or VM folder path provided!")
 
     Disconnect(service_instance)
 
