@@ -10,6 +10,7 @@ https://kb.vmware.com/s/article/1020128
 If you have disks that are set to independent-persistent mode and want to be able to snapshor those, you
 can use the parameter --dependent in combination with the --enable command. This will enable Change
 Block Tracking and set the disk mode to dependent-persistent
+https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.vm_admin.doc/GUID-8B6174E6-36A8-42DA-ACF7-0DA4D8C5B084.html
 
 ## Configuration:
 - Configure a config.ini file your vCenter connection details and credentials. See the config.ini.example
