@@ -84,6 +84,9 @@ def enable_cbt_on_vm(vm):
             if "independent" in disk_mode:
                 print(
                     f" - Warning: Disk '{device.deviceInfo.label}' on VM '{vm.name}' is configured as '{disk_mode}'. Snapshots may not work as expected.", end='')
+                if disk_mode == "independent_persistent" and args.dependent:
+                    print (f"Converting disk")
+
             disk_spec = vim.vm.device.VirtualDeviceSpec()
             disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
             disk_spec.device = device
@@ -106,6 +109,7 @@ def main():
     group.add_argument("--vm_name", help="The name of the virtual machine")
     group.add_argument("--vm_folder", help="The path of the folder containing VMs")
     parser.add_argument("--enable", action='store_true', help="Enable Change Block tracking")
+    parser.add_argument("--dependent", action='store_true', help="Convert independent-persistent disk to dependent")
     args = parser.parse_args()
 
     service_instance = connect_to_vc(vc_host, vc_user, vc_password, ssl_context)
