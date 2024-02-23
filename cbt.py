@@ -63,14 +63,14 @@ def display_cbt_info(vm):
             print(f"  Disk: {device.deviceInfo.label}")
             if device.backing.changeId:
                 print(f"    CBT Enabled: Yes")
-            disk_mode = device.backing.diskMode
-            if "independent" in disk_mode:
-                print(f"    Warning: Disk '{device.deviceInfo.label}' on VM '{vm.name}' is configured as '{disk_mode}'. Snapshots may not work as expected.", end='')
             else:
                 if vm.config.changeTrackingEnabled:
                     print(f"    CBT Enabled: No - VM possibly needs a reboot?")
                 else:
                     print(f"    CBT Enabled: No")
+            disk_mode = device.backing.diskMode
+            if "independent" in disk_mode:
+                print(f"    Warning: Disk '{device.deviceInfo.label}' on VM '{vm.name}' is configured as '{disk_mode}'. Snapshots may not work as expected.")
 
 def enable_cbt_on_vm(vm):
     print(f"Enabling CBT for VM: {vm.name}", end='')
