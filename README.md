@@ -7,11 +7,31 @@ Oracle Cloud Migration Service. If you want your VMs to be replicated with only
 the last changes per replication cycle, you need to enable your VMs with Change Block Tracking (CBT)
 https://kb.vmware.com/s/article/1020128
 
+If you have disks that are set to independent-persistent mode and want to be able to snapshor those, you
+can use the parameter --dependent in combination with the --enable command. This will enable Change
+Block Tracking and set the disk mode to dependent-persistent
+
 ## Configuration:
-- Configure in the config.ini file your vCenter connection details and credentials.
+- Configure a config.ini file your vCenter connection details and credentials. See the config.ini.example
 - install requirements: pip install -r requirements.txt
 
 ## Usage
+```
+usage: cbt.py [-h] (--vm_name VM_NAME | --vm_folder VM_FOLDER) [--enable] [--dependent]
+
+Get or Set Change Block Tracking (CBT) on a VM or all VMs in a folder.
+
+options:
+  -h, --help            show this help message and exit
+  --vm_name VM_NAME     The name of the virtual machine
+  --vm_folder VM_FOLDER
+                        The path of the folder containing VMs
+  --enable              Enable Change Block tracking
+  --dependent           Convert independent-persistent disk to dependent-persistent
+```
+
+## Usage - Examples
+
 show the status of a VM:
 >python cbt.py --vm_name YourVMName
 
