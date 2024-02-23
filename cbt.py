@@ -6,7 +6,7 @@ import configparser
 
 # Read configuration from config.ini.example
 config = configparser.ConfigParser()
-config.read('config.ini.example')
+config.read('config.ini')
 vc_host = config.get('vCenter', 'host')
 vc_user = config.get('vCenter', 'user')
 vc_password = config.get('vCenter', 'password')
